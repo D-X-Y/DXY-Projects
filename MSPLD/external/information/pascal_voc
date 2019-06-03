@@ -1,0 +1,4 @@
+Person  : person
+Animal  : bird, cat, cow, dog, horse, sheep
+Vehicle : aeroplane, bicycle, boat, bus, car, motorbike, train
+Indoor  : bottle, chair, diningtable, potted/plant, sofa, tv/monitor

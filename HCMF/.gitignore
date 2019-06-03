@@ -1,0 +1,17 @@
+*.aux
+*.log
+*.bbl
+*.blg
+*.out
+*.pdf
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.brf
+*.DS_Store
+*.eps
+reference
+resource/*.pdf
+*.mexmaci64
+*/.DS_Store
+*/*/.DS_Store

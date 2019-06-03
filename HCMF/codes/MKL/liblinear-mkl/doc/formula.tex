@@ -1,0 +1,184 @@
+\documentclass[12pt]{article}
+\usepackage{theorem}
+\usepackage{amsmath,amssymb,latexsym,xspace,float,multirow,fancyvrb,xr-hyper,xr}
+\usepackage{subfigure,epsfig,url}
+\usepackage[breaklinks=true]{hyperref}
+\usepackage{amsmath,latexsym,epsfig}
+\floatstyle{ruled}
+\newfloat{Algorithm}{tb}{lox}
+\floatname{Algorithm}{Algorithm}
+\usepackage{paralist}
+\usepackage{afterpage}
+\usepackage{natbib}
+\usepackage{color}
+
+\newfloat{Algorithm}{tb}{lox}
+\floatname{Algorithm}{Algorithm}
+
+
+\def\bw{{\boldsymbol w}}
+\def\balpha{{\boldsymbol \alpha}}
+\def\bd{{\boldsymbol d}}
+\def\be{{\boldsymbol e}}
+\def\bzero{{\boldsymbol 0}}
+\def\bx{{\boldsymbol x}}
+\def\by{{\boldsymbol y}}
+\def\bxi{{\boldsymbol \xi}}
+\def\liblinear{{\sf LIBLINEAR}\xspace}
+
+
+\begin{document}
+\title{LIBLINEAR MKL Document}
+\author{Ming-Hen Tsai 
+  \\ Ph.D student, Columbia University
+  \\ mt2767@columbia.edu}
+\maketitle
+\section{Introduction to Multiple Kernel Learning SVM}
+The original multiple kernel learning SVM has a dual form,
+\begin{equation}
+\label{eq:mkl_svm_dual}
+\min_{\bd} \min_{\balpha} \frac{1}{2} \balpha^T Q \balpha + \gamma \balpha^T \balpha - \be^T \balpha 
+\end{equation}
+, where 
+\begin{equation}
+\label{eq:mkl_svm_dual_sum_kernel}
+Q = \sum_{m=1}^M d_m Q_m 
+\end{equation}
+, subject to
+\begin{align}
+\label{eq:mkl_svm_dual_eq_constraint}
+\balpha^T \by = 0 \\
+\sum_m \|d_m\| = 1
+\end{align}
+and
+\begin{align}
+\label{eq:mkl_svm_dual_ineq_constraint}
+d_m \ge 0 \quad \forall m\\
+0 \le \alpha_i \le U \quad \forall i \mbox{.}
+\end{align}
+
+L2-regularized L1-loss SVM has $U = C$ and $\gamma = 0$. While
+L2-regularized L2-loss SVM has $U = \infty$ and $\gamma = \frac{1}{2C}$.
+
+It has a corresponding primal form (without considering $\bd$),
+\begin{equation}
+\label{eq:mkl_svm_primal}
+\min_{\bd} \min_{\bw,b} \frac{1}{2} \sum_m \frac{1}{d_m} \bw_m^T \bw_m + \sum_i \xi^p
+\end{equation}
+, subject to
+\begin{align}
+\label{eq:mkl_svm_primal_ineq_constraint}
+\sum_m \|d_m\| = 1\\
+d_m \ge 0 \quad \forall m\\
+\xi_i \ge 0 \\
+\xi_i \ge 1-y_i \sum_m \bw_m^T \phi_m(\bx_i) + b \quad \forall i \mbox{.}
+\end{align}
+
+The primal-dual correspondence is
+\begin{equation}
+\label{eq:primal_dual_correspondence_w}
+\bw_m = d_m \sum_i y_i \alpha_i \phi_m(x_i) 
+\end{equation}
+, and
+\begin{equation}
+\label{eq:primal_dual_correspondence_Q}
+Q_m = 
+[y_1\phi_m(\bx_1)  y_2\phi_m(\bx_2) \ldots y_l\phi_m(\bx_l)]^T 
+[y_1\phi_m(\bx_1)  y_2\phi_m(\bx_2) \ldots y_l\phi_m(\bx_l)]
+\end{equation}
+
+For L2-regularized L1-loss SVM, $p=1$.
+For L2-regularized L2-loss SVM, $p=2$.
+
+\section{Dual Coordinate Descent for Multiple Kernel Learning SVM}
+
+In practice, we can use a formulation without $b$, and obtaining similar performance. 
+If we want this $b$, we can add a dimension of all ones to all training instances $\bx_i$ to get a similar formula. 
+Details can be found in \liblinear document.
+
+
+
+By not using $b$, we get a new primal formula that has 
+$b=0$ in \eqref{eq:mkl_svm_primal_ineq_constraint} 
+and will not have \eqref{eq:mkl_svm_dual_eq_constraint} in the dual form.
+
+
+
+
+By letting $\bd$ as constants, we let the dual objective function as
+$$ f(\balpha) = \frac{1}{2} \balpha^T Q \balpha + \frac{1}{2} \gamma \balpha^T \balpha - \be^T \balpha  $$
+It has gradient 
+$$ \nabla f(\balpha) = Q \balpha + \gamma \balpha - \be \mbox{.} $$
+In dimension $i$, it is
+\begin{align}
+\label{eq:gradient_one_dim}
+\nabla_i f(\balpha) & = \sum_j \alpha_j Q_{ij} \balpha + \gamma \alpha_i  - 1 \\
+                    &  \mbox{By \eqref{eq:primal_dual_correspondence_Q}} \\
+                    & = \sum_j \alpha_j \sum_m d_m y_i y_j \phi_m(x_i) \phi_m(x_j) \balpha + \gamma \alpha_i  - 1 \\
+                     & \mbox{By \eqref{eq:primal_dual_correspondence_w}} \\
+                     & = y_i \sum_m w_m^T \phi_m(\bx_i) + \gamma \alpha_i -1 \mbox{.}
+\end{align}
+
+Let $\be_i$ be the vector with $i$-th dimension as one and all others zero.
+Let $g(d) = f(\balpha + d\be_i)$. 
+\begin{equation}
+\label{eq:second_order_opt}
+\arg \inf_d g(d) =  \nabla_i f(\balpha) /(Q_{ii} + \gamma)
+\end{equation}
+  is the lowest point of the quadratic figure.
+
+
+
+
+For notation convenience, we let $$\bw = [\bw_1^T \bw_2^T \ldots \bw_M^T]^T$$
+and $$\bar{\bx_i} = [\phi_1(\bx_i)^T \phi_2(\bx_i)^T \ldots \phi_M(\bx_i)^T]^T \mbox{.}$$ 
+So \eqref{eq:gradient_one_dim} becomes
+\begin{equation}
+\label{eq:gradient_one_dim_simplified}
+\nabla_i f(\balpha)  = y_i \bw^T \bar{\bx_i} + \gamma \alpha_i  - 1 \mbox{.}
+\end{equation}
+
+	
+Here comes a dual coordinate descent method for multiple kernel learning SVM in primal in Algorithm \ref{alg:dual-cd-mkl}.
+
+
+Now, we can take $\bd$ into consideration. By fixing other parameters, $\bd$ can be solved by linear programming methods. Then, we can alternatively solve linear SVM and a linear programming problem. It is the core idea in \liblinear MKL.
+
+
+\begin{Algorithm}
+	\caption{A dual coordinate descent method for MKL SVM}
+	\label{alg:dual-cd-mkl}
+\begin{compactitem}
+		\item Given $\balpha = \bzero$ and the corresponding $\bw= \sum_i y_i \alpha_i \bx_i$.
+		\item While $\balpha$ is not optimal
+			\begin{description}
+				\item  Random choose instance $i$
+            \begin{enumerate}[(a)]
+          \item $G = y_i \bw^T \bar{\bx_i} -1 + \gamma\alpha_i$ by \eqref{eq:gradient_one_dim_simplified}
+          \item \begin{equation*}
+				  \hspace{-25pt}
+				  PG = \begin{cases}
+              \min(G,0) & \text{if $\alpha_i = 0$},\\
+              \max(G,0) & \text{if $\alpha_i = U$},\\
+              G & \text{if $0<\alpha_i < U$}
+            \end{cases}
+          \end{equation*}
+        \item If $|PG| \neq 0$, \label{step:last}
+          \begin{itemize}
+
+           \item[] $\bar{\alpha}_i \leftarrow \alpha_i$ 
+   		  \item[] $\alpha_i \leftarrow \min (\max (\alpha_i - G/(Q_{ii} + \gamma), 0),U )$ by \eqref{eq:second_order_opt}
+					\item[]  $\bw_m \leftarrow \bw_m + d_m (\alpha_i - \bar{\alpha}_i) y_i \bx_i \quad \forall m$
+          \end{itemize}
+
+			\end{enumerate}
+		\end{description}
+	\end{compactitem}
+\end{Algorithm}
+
+
+
+\end{document}
+
+
+

@@ -1,0 +1,21 @@
+# Toronto COCO-QA Dataset
+
+http://www.cs.toronto.edu/~mren/imageqa/data/cocoqa/
+
+# Overview
+
+- Automatically generated from image captions.
+- 123287 images
+- 78736 train questions
+- 38948 test questions
+- 4 types of questions: object, number, color, location
+- Answers are all one-word.
+
+## Files
+
+The zip file contains two folders: train and test. Each folder has the following files:
+
+- img_ids.txt: Each line contains an original image ID in the MS-COCO dataset
+- questions.txt: Each line contains a question, in plain text
+- answers.txt: Each line contains an answer to the question, in plain text
+- types.txt: Each line contains an integer denoting the question type: 0 -> object, 1 -> number, 2 -> color, 3 -> location
