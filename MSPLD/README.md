@@ -20,6 +20,9 @@ If you find MSPLD useful in your research, please consider citing:
   title   = {Few-Example Object Detection with Model Communication},
   author  = {Dong, Xuanyi and Zheng, Liang and Ma, Fan and Yang, Yi and Meng, Deyu},
   journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)},
+  volume  = {41},
+  number  = {7},
+  pages   = {1641-1654},
   doi     = {10.1109/TPAMI.2018.2844853}, 
   ISSN    = {0162-8828}, 
   year    = {2018}
