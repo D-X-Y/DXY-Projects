@@ -1,23 +1,23 @@
 # This repo contains some of my previous projects
 
-- Few-Example Object Detection with Model Communication, TPAMI 2018
+- Few-Example Object Detection with Model Communication, TPAMI 2019
 - Late Fusion via Subspace Search with Consistency Preservation, TIP 2019
 - Fast Parameter Adaptation for Few-shot Image Captioning and Visual Question Answering, ACM MM 2018
 - A Dual-Network Progressive Approach to Weakly Supervised Object Detection, ACM MM 2017
 
-## Few-Example Object Detection with Model Communication
+## [Few-Example Object Detection with Model Communication](https://ieeexplore.ieee.org/document/8374906)
 
 See details in [the MSPLD folder](https://github.com/D-X-Y/DXY-Projects/tree/master/MSPLD).
 
-## Late Fusion via Subspace Search with Consistency Preservation
+## [Late Fusion via Subspace Search with Consistency Preservation](https://ieeexplore.ieee.org/document/8451915)
 
 See details in [the HCMF folder](https://github.com/D-X-Y/DXY-Projects/tree/master/HCMF).
 
-## Fast Parameter Adaptation for Few-shot Image Captioning and Visual Question Answering
+## [Fast Parameter Adaptation for Few-shot Image Captioning and Visual Question Answering](https://dl.acm.org/citation.cfm?id=3240527)
 
 See details in [the FPAIT folder](https://github.com/D-X-Y/DXY-Projects/tree/master/FPAIT).
 
-## A Dual-Network Progressive Approach to Weakly Supervised Object Detection
+## [A Dual-Network Progressive Approach to Weakly Supervised Object Detection](https://dl.acm.org/citation.cfm?id=3123455)
 
 See details in [the Dual-WSOD foler](https://github.com/D-X-Y/DXY-Projects/tree/master/Dual-WSOD).
 
@@ -25,13 +25,16 @@ See details in [the Dual-WSOD foler](https://github.com/D-X-Y/DXY-Projects/tree/
 ## Citation
 If you find this repo help your research, please consider citing:
 ```
-@article{dong2018fewexample,
+@article{dong2019fewexample,
   title   = {Few-Example Object Detection with Model Communication},
   author  = {Dong, Xuanyi and Zheng, Liang and Ma, Fan and Yang, Yi and Meng, Deyu},
   journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)},
+  volume  = {41},
+  number  = {7},
+  pages   = {1641-1654},
   doi     = {10.1109/TPAMI.2018.2844853}, 
   ISSN    = {0162-8828}, 
-  year    = {2018}
+  year    = {2019}
 }
 @article{dong2019hcmf,
   title  = {Late Fusion via Subspace Search with Consistency Preservation},
