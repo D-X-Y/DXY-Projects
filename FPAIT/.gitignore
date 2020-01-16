@@ -3,3 +3,5 @@ cocoapi/pycocotools/_mask*so
 */__pycache__
 */*/__pycache__
 */*/*.pth
+*.log
+*/*.log

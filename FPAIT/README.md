@@ -15,7 +15,7 @@ Make directory at `~/datasets/MS-COCO`.
 -- annotations
 --- captions_train2014.json captions_val2014.json image_info_test2014.json instances_train2014.json instances_val2014.json
 -- test2014
--- trainval2014
+-- trainval2014 (which is created by merging val2014 and train2014)
 ```
 
 
@@ -41,11 +41,14 @@ python Generate_VQA.py
 ```
 After run the above command, you can obtain `data/Toronto-COCO-QA/object.pth` for few-shot visual question answering.
 
+
 ### Show Samples
 We give an example to show how to read the pre-processed data
 ```
 python show_data.py
 ```
+
+An examlpe skeleton code is as `skeleton.py`.
 
 
 ## Citation
