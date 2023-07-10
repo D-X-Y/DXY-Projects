@@ -97,8 +97,14 @@ alias l='ls -CF'
 #. $HOME/.local/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh
 export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 # export PATH="$HOME/anaconda3/bin:$PATH"  # commented out by conda initialize
-#export PATH="/usr/local/opt/qt/bin:$PATH"
-#export PATH="/usr/local/opt/libxml2/bin:$PATH"
+# export PATH="/usr/local/opt/qt/bin:$PATH"
+# export PATH="/usr/local/opt/libxml2/bin:$PATH"
 
-source ~/.bash_profile
+# source ~/.bash_profile
 export TORCH_HOME="$HOME/.torch"
+
+prompt_context() {
+  if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
+    prompt_segment black default "%(!.%{%F{yellow}%}.)$USER"
+  fi
+}
