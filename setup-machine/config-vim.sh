@@ -1,10 +1,10 @@
 #!/bin/bash
 
+# VIM
 git clone https://github.com/altercation/solarized.git
 mkdir -p ~/.vim/colors
 cp solarized/vim-colors-solarized/colors/solarized.vim ~/.vim/colors/
 rm -rf solarized
-
 git clone https://github.com/fugalh/desert.vim.git
 cp desert.vim/colors/desert.vim ~/.vim/colors/
 rm -rf desert.vim
@@ -14,6 +14,7 @@ cp meta/vimrc ~/.vimrc
 # cp -r dircolors-solarized ~/.dir_colors
 # rm -rf dircolors-solarized
 
+# TMUX
 cp meta/tmux.conf ~/.tmux.conf
 
 git clone https://github.com/opensourcedesign/fonts.git
@@ -23,3 +24,9 @@ rm -rf fonts
 
 # Git Completion System
 curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/.git-completion.bash
+
+# Config GitHub
+git config --global user.email "dxy@augment.code"
+git config --global user.name "D-X-Y"
+git config --global push.default matching
+git config --global push.default simple
