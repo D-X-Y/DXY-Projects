@@ -125,7 +125,7 @@ if ! shopt -oq posix; then
 fi
 
 if [ -f ~/.git-completion.bash ]; then
-    . ~/.git-completion.bash
+    bash ~/.git-completion.bash
 fi
 
 # DXY personalized enviornment
