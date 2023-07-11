@@ -124,8 +124,12 @@ if ! shopt -oq posix; then
   fi
 fi
 
+if [ -f ~/.git-completion.bash ]; then
+    . ~/.git-completion.bash
+fi
+
 # DXY personalized enviornment
-export TORCH_HOME="$HOME/.torch"
+# export TORCH_HOME="$HOME/.torch"
 
 # Command History Settings
 export HISTTIMEFORMAT='%F, %T '

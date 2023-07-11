@@ -16,3 +16,6 @@ cp meta/tmux.conf ~/.tmux.conf
 git clone https://github.com/opensourcedesign/fonts.git
 mkdir -p ~/.fonts/freefont
 cp fonts/gnu-freefont_freemono/FreeMono.ttf  ~/.fonts/freefont/
+
+# Git Completion System
+curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/.git-completion.bash
