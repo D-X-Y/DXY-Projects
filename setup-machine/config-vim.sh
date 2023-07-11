@@ -3,6 +3,8 @@
 git clone https://github.com/altercation/solarized.git
 mkdir -p ~/.vim/colors
 cp solarized/vim-colors-solarized/colors/solarized.vim ~/.vim/colors/
+rm -rf solarized
+
 git clone https://github.com/fugalh/desert.vim.git
 cp desert.vim/colors/desert.vim ~/.vim/colors/
 rm -rf desert.vim
