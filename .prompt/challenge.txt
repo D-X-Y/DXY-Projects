@@ -1,0 +1,74 @@
+What is wrong with my code?
+
+```
+
+class SimpleCachedAttn(AttentionFn):
+    """Straight-line attention implementation with k/v-cache for generation."""
+
+    def __init__(
+        self,
+        n_local_heads: int,
+        n_local_kv_heads: int,
+        head_dim: int,
+        max_batch_size: int,
+        max_seq_len: int,
+    ):
+        super(SimpleCachedAttn, self).__init__()
+        self.cache_k = torch.zeros(
+            (max_batch_size, max_seq_len, n_local_kv_heads, head_dim)
+        )
+        self.cache_v = torch.zeros(
+            (max_batch_size, max_seq_len, n_local_kv_heads, head_dim)
+        )
+        self.n_kv_reps = n_local_heads // n_local_kv_heads
+        self.head_dim = head_dim
+
+    def forward(
+        self,
+        xq: Tensor,
+        xk: Tensor,
+        xv: Tensor,
+        start_pos: int | None = None,
+        mask: Tensor | None = None,
+    ):
+        assert start_pos is not None
+        bsz, seqlen, _, head_dim = xq.shape  # (bs, seqlen, n_local_heads, head_dim)
+        # We have to online move the data to the right dtype and cuda, otherwise we need to put them
+        # as buffer or parameters, which will cause trouble when loading the model.
+        self.cache_k = self.cache_k.to(xq)
+        self.cache_v = self.cache_v.to(xq)
+
+        self.cache_k[:bsz, start_pos : start_pos + seqlen] = xk
+        self.cache_v[:bsz, start_pos : start_pos + seqlen] = xv
+
+        keys = self.cache_k[:bsz, : start_pos + seqlen]
+        values = self.cache_v[:bsz, : start_pos + seqlen]
+
+        # repeat k/v heads if n_kv_heads < n_heads (MQA / GQA)
+        keys = repeat_kv(keys, self.n_kv_reps)  # (bs, seqlen, n_local_heads, head_dim)
+        values = repeat_kv(values, self.n_kv_reps)
+
+        xq = xq.transpose(1, 2)  # (bs, n_local_heads, seqlen, head_dim)
+        keys = keys.transpose(1, 2)
+        values = values.transpose(1, 2)
+
+        # scores = torch.matmul(xq, keys.transpose(2, 3)) / math.sqrt(self.head_dim)
+        # if mask is not None:
+        #     scores = scores + mask  # (bs, n_local_heads, seqlen, cache_len + seqlen)
+        # scores = F.softmax(scores.float(), dim=-1).type_as(xq)
+        # output = torch.matmul(scores, values)  # (bs, n_local_heads, seqlen, head_dim)
+        # import pdb
+
+        # pdb.set_trace()
+        output = F.scaled_dot_product_attention(
+            xq, keys, values, is_causal=mask is None, attn_mask=mask
+        )
+        # output_2 = flash_attn.flash_attn_func(xq, keys, values, dropout_p=0, softmax_scale=head_dim**-0.5, causal=True, deterministic=True, return_attn_probs=False)
+        return output.transpose(1, 2).contiguous()
+```
+especially with F.scaled_dot_product_attention(
+            xq, keys, values, is_causal=mask is None, attn_mask=mask
+        )
+
+It seems that when I try to call the model, the first generated token is correct but starting from second one, it got wrong....
+Help me correct my bug!
