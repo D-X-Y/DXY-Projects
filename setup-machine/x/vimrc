@@ -6,7 +6,6 @@ set relativenumber          " Relative numbers for motion
 set showcmd                 " Show command in bottom bar
 set cursorline              " Highlight current line
 set title                   " Show filename in window title
-set mouse=a                 " Enable mouse support
 set clipboard=unnamedplus   " Use system clipboard
 
 " -------------------------------
@@ -33,6 +32,10 @@ set wrap                    " Enable line wrap
 syntax on                   " Enable syntax highlighting
 set background=dark         " Use dark background
 colorscheme desert          " Built-in color scheme
+:set nonumber norelativenumber
+set mouse=n
+
+
 
 " -------------------------------
 " File behavior
