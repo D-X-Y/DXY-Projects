@@ -1,0 +1,129 @@
+# -------------------------------
+# History settings
+# -------------------------------
+HISTSIZE=10000
+HISTFILESIZE=20000
+HISTCONTROL=ignoredups:erasedups
+shopt -s histappend
+PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+
+# -------------------------------
+# Enable tab autocompletion
+# -------------------------------
+if [ -f /etc/bash_completion ]; then
+  . /etc/bash_completion
+elif [ -f /usr/share/bash-completion/bash_completion ]; then
+  . /usr/share/bash-completion/bash_completion
+fi
+
+# -------------------------------
+# LS Color support and aliases
+# -------------------------------
+export CLICOLOR=1
+export LS_OPTIONS='--color=auto'
+eval "$(dircolors -b)"
+alias ls='ls --color=auto'
+alias ll='ls -lah --color=auto'
+alias la='ls -A --color=auto'
+alias l='ls -CF --color=auto'
+alias ..='cd ..'
+alias ...='cd ../..'
+
+# Git branch function (no echo!)
+parse_git_branch() {
+  git rev-parse --abbrev-ref HEAD 2>/dev/null
+}
+
+# Python venv name (no echo!)
+venv_prompt() {
+  [[ -n "$VIRTUAL_ENV" ]] && basename "$VIRTUAL_ENV"
+}
+
+# Set PS1 (no unintended line breaks or command output)
+PS1='\[\e[36m\]\u@\h\[\e[0m\] \[\e[33m\]\w\[\e[0m\] \[\e[32m\]$(venv_prompt)$(parse_git_branch)\[\e[0m\] \$ '
+
+
+# -------------------------------
+# Misc Bash options
+# -------------------------------
+shopt -s checkwinsize       # Resize-aware
+shopt -s globstar           # Recursive ** globbing
+shopt -s cmdhist            # Multi-line commands in one history entry
+shopt -s extglob            # Extended globbing
+
+# This needs to be run from the xlformers top-level dir, i.e., fbsource/genai/xlformers
+conda_new() {
+  # finetune for post-training (SFT/RL) and llama4 for pre-training
+  # source dev/xl_conda.sh activate xlformers_finetune_conda:stable
+  source dev/xl_conda.sh activate xlformers_llama4_conda:stable
+  return 0
+}
+
+mount_stuff() {
+    mkdir -p ~/pci-wsf ~/eag-wsf
+    sudo umount ~/pci-wsf ~/eag-wsf
+    oilfs ws://ws.ai.pci0ai/genai_fair_llm ~/pci-wsf
+    oilfs ws://ws.ai.eag0genai/genai_fair_llm ~/eag-wsf
+}
+
+
+mount_stuff_v2() {
+    sh ~/fbsource/genai/xlformers/dev/xlws.sh hmount
+    sh ~/fbsource/genai/xlformers/dev/xlws.sh mount
+}
+
+
+mount_airstore() {
+  export AIRSTORE_LOCAL_MOUNT_ROOT=$HOME/airstore
+  export PYTHONPATH=$PYTHONPATH:/packages/ws_airstore.client/lib
+  export AIRSTORE_DECRYPT_SERVER_PATH=/packages/ws_airstore.client/decrypt_server
+  fbclone fbsource
+  sudo fusermount -u ${HOME}/airstore
+  ~/fbsource/fbcode/warm_storage/experimental/ws_airstore/tools/eval_dev_airstore.sh pci
+}
+
+
+mount_airstore_v2() {
+  export REGION=pci
+
+  eval $(~/fbsource/fbcode/warm_storage/experimental/ws_airstore/tools/eval_dev_airstore.sh $REGION)
+}
+
+
+setup_genai_env() {
+  conda_new && mount_stuff && mount_airstore
+}
+
+# Add the command below, this is for allowing devservefrs to connect to the outside internet. This is useful for installing third-party libraries, for example, as with-proxy pip install zstandard.
+alias with-proxy='HTTPS_PROXY=http://fwdproxy:8080 HTTP_PROXY=http://fwdproxy:8080 FTP_PROXY=http://fwdproxy:8080 https_proxy=http://fwdproxy:8080 http_proxy=http://fwdproxy:8080 ftp_proxy=http://fwdproxy:8080 http_no_proxy='\''\'\'\''*.facebook.com|*.tfbnw.net|*.fb.com'\''\'\'
+
+# Get the definition of a training job
+describe_run() {
+    job=$1
+    mast get-job-definition $job --simple-json
+}
+
+# Diff two job definitions
+diff_jobs() {
+    job1=$1
+    job2=$2
+    mast get-job-definition $job1 --simple-json > /tmp/$job1.json
+    mast get-job-definition $job2 --simple-json > /tmp/$job2.json
+    vimdiff /tmp/$job1.json /tmp/$job2.json
+}
+
+# Get all training job names with a certain prefix
+get_jobs() {
+    prefix=$1
+    mast list-jobs --prefix $prefix --include-historical | cut -f1 -d' '
+}
+
+# mkdir ~/conda_env
+# cd ~/conda_env
+# fbpkg fetch xlformers_llama4_flagship_conda:stable
+# source conda/bin/activate
+# source ~/conda_env/conda/bin/activate
+export CONDA_CHANGEPS1=yes
+source ~/.conda/envs/xlformers_llama4_conda-newest/bin/activate
+
+alias cdstable="cd ~/fbsource/genai/xlformers-branches/scaling-stable"
