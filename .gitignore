@@ -60,3 +60,7 @@ Temporary Items
 .apdisk
 *.swp
 
+*~
+*/*~
+*/*/*~
+
